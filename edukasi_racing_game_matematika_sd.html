@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EDUKASI RACING - Game Matematika SD</title>
+  <!-- Tailwind CSS untuk tata letak responsif -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka untuk judul ceria & Nunito untuk keterbacaan anak SD -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --font-display: 'Fredoka', sans-serif;
+      --font-body: 'Nunito', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: radial-gradient(circle at top, #1769aa 0%, #091d3e 70%, #051126 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: var(--font-display);
+    }
+
+    /* Tampilan Pecahan Bertumpuk (Numerator / Denominator) */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 4px;
+      line-height: 1.05;
+      font-weight: 800;
+    }
+    .frac-top {
+      border-bottom: 2.5px solid currentColor;
+      padding: 0 5px 2px 5px;
+      min-width: 22px;
+      text-align: center;
+    }
+    .frac-bottom {
+      padding: 2px 5px 0 5px;
+      min-width: 22px;
+      text-align: center;
+    }
+    .math-op {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 6px;
+      font-weight: 900;
+    }
+
+    /* Animasi Mobil & Lintasan */
+    @keyframes floatCar {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(-1.5deg); }
+    }
+    .car-float {
+      animation: floatCar 2s ease-in-out infinite;
+    }
+
+    @keyframes engineIdle {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-1.5px); }
+    }
+    .car-idle {
+      animation: engineIdle 0.25s infinite;
+    }
+
+    @keyframes turboBoost {
+      0% { transform: scale(1) translateY(0); }
+      30% { transform: scale(1.08) translateY(-4px); }
+      60% { transform: scale(1.03) translateY(-1px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .car-boost {
+      animation: turboBoost 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes roadScroll {
+      from { background-position-x: 0px; }
+      to { background-position-x: -120px; }
+    }
+
+    @keyframes cloudMove {
+      from { transform: translateX(105vw); }
+      to { transform: translateX(-160px); }
+    }
+
+    /* Lintasan Balap */
+    .race-track-container {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 4px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+      background: linear-gradient(180deg, #5cc8ff 0%, #bae8ff 100%);
+    }
+
+    .sky-zone {
+      position: relative;
+      height: 54px;
+      overflow: hidden;
+    }
+
+    .cloud {
+      position: absolute;
+      top: 8px;
+      opacity: 0.9;
+      animation: cloudMove 28s linear infinite;
+    }
+    .cloud.c2 {
+      top: 22px;
+      animation-duration: 38s;
+      animation-delay: -14s;
+      transform: scale(0.75);
+    }
+
+    .grass-top {
+      height: 16px;
+      background: repeating-linear-gradient(
+        90deg,
+        #48bb3c 0px,
+        #48bb3c 40px,
+        #3ca631 40px,
+        #3ca631 80px
+      );
+      border-top: 3px solid #7ce36f;
+      border-bottom: 4px solid #ffffff;
+    }
+
+    .asphalt-road {
+      position: relative;
+      height: 148px;
+      background-color: #2f3542;
+      background-image: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.03) 0px,
+        rgba(255, 255, 255, 0.03) 60px,
+        rgba(0, 0, 0, 0.08) 60px,
+        rgba(0, 0, 0, 0.08) 120px
+      );
+      animation: roadScroll 2.2s linear infinite;
+    }
+
+    .asphalt-road.paused {
+      animation-play-state: paused;
+    }
+
+    .lane-divider {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      transform: translateY(-50%);
+      background: repeating-linear-gradient(
+        90deg,
+        #ffd32a 0px,
+        #ffd32a 32px,
+        transparent 32px,
+        transparent 64px
+      );
+      animation: roadScroll 1.1s linear infinite;
+    }
+
+    .asphalt-road.paused .lane-divider {
+      animation-play-state: paused;
+    }
+
+    .grass-bottom {
+      height: 18px;
+      background: repeating-linear-gradient(
+        90deg,
+        #3ca631 0px,
+        #3ca631 40px,
+        #2f8e25 40px,
+        #2f8e25 80px
+      );
+      border-top: 4px solid #ffffff;
+    }
+
+    .finish-line {
+      position: absolute;
+      right: 18px;
+      top: 0;
+      bottom: 0;
+      width: 24px;
+      z-index: 2;
+      background-image:
+        linear-gradient(45deg, #111 25%, transparent 25%),
+        linear-gradient(-45deg, #111 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #111 75%),
+        linear-gradient(-45deg, transparent 75%, #111 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+      background-color: #ffffff;
+      box-shadow: -3px 0 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .racer-wrapper {
+      position: absolute;
+      left: 2%;
+      width: 82px;
+      z-index: 5;
+      transition: left 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+      filter: drop-shadow(0 6px 5px rgba(0, 0, 0, 0.5));
+    }
+
+    .racer-player {
+      top: 10px;
+    }
+
+    .racer-ai {
+      top: 80px;
+    }
+
+    /* Api Knalpot Nitro */
+    .nitro-flame {
+      opacity: 0;
+      transform-origin: right center;
+      transition: opacity 0.2s ease;
+    }
+    .nitro-active .nitro-flame {
+      opacity: 1;
+      animation: flameFlicker 0.12s infinite alternate;
+    }
+    @keyframes flameFlicker {
+      from { transform: scaleX(0.85); }
+      to { transform: scaleX(1.25); }
+    }
+
+    /* Tombol 3D Game */
+    .game-btn {
+      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+    }
+    .game-btn:hover:not(:disabled) {
+      filter: brightness(1.06);
+      transform: translateY(-2px);
+    }
+    .game-btn:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4) !important;
+    }
+
+    /* Kartu Pilihan Jawaban */
+    .option-card {
+      background: linear-gradient(180deg, #ffffff 0%, #e4f3ff 100%);
+      color: #0f2c59;
+      border: 3px solid #7cc4fa;
+      box-shadow: 0 5px 0 #3b82b6;
+      transition: all 0.15s ease;
+    }
+    .option-card:hover:not(:disabled) {
+      border-color: #ffb703;
+      background: linear-gradient(180deg, #fffdf5 0%, #fff0c2 100%);
+      transform: translateY(-2px);
+    }
+    .option-card:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #3b82b6;
+    }
+    .option-card.correct {
+      background: linear-gradient(180deg, #6ef29b 0%, #2ed573 100%) !important;
+      border-color: #097938 !important;
+      box-shadow: 0 5px 0 #097938 !important;
+      color: #053b1b !important;
+    }
+    .option-card.wrong {
+      background: linear-gradient(180deg, #ff9a9a 0%, #ff5252 100%) !important;
+      border-color: #9e1414 !important;
+      box-shadow: 0 5px 0 #9e1414 !important;
+      color: #4a0404 !important;
+    }
+
+    /* Responsif Layar Kecil */
+    @media (max-width: 640px) {
+      .asphalt-road {
+        height: 124px;
+      }
+      .racer-wrapper {
+        width: 66px;
+      }
+      .racer-player {
+        top: 8px;
+      }
+      .racer-ai {
+        top: 66px;
+      }
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen select-none">
+
+  <!-- HEADER UTAMA -->
+  <header class="bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 py-3 px-4 shadow-xl border-b-4 border-amber-300/60">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <div class="bg-white/20 p-2 rounded-2xl backdrop-blur-sm shadow-inner">
+          <span class="text-2xl sm:text-3xl">🏁</span>
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-wide text-white drop-shadow-[0_3px_0_rgba(120,25,10,0.85)]">
+            EDUKASI RACING
+          </h1>
+          <p class="text-xs sm:text-sm font-extrabold text-amber-100 tracking-wider uppercase">
+            Matematika SD • Operasi Pecahan
+          </p>
+        </div>
+      </div>
+
+      <!-- Kontrol Cepat Global -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleSound()" id="globalSoundBtn" class="game-btn bg-sky-950/60 hover:bg-sky-900/80 text-white text-xs sm:text-sm font-extrabold px-3.5 py-2 rounded-xl border border-white/30 shadow-md flex items-center gap-1.5">
+          <span>🔊</span> <span class="sound-label">SUARA ON</span>
+        </button>
+        <button onclick="toggleFullScreen()" class="game-btn bg-sky-950/60 hover:bg-sky-900/80 text-white text-xs sm:text-sm font-extrabold px-3.5 py-2 rounded-xl border border-white/30 shadow-md flex items-center gap-1.5">
+          <span>⛶</span> <span class="hidden sm:inline">LAYAR PENUH</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5 flex flex-col justify-center">
+
+    <!-- ==================== 1. MENU UTAMA ==================== -->
+    <section id="homeScreen" class="bg-white/10 backdrop-blur-md border-2 border-white/25 rounded-3xl p-5 sm:p-8 shadow-2xl text-center">
+      <div class="inline-block bg-amber-400 text-slate-900 font-black text-xs sm:text-sm px-4 py-1.5 rounded-full uppercase tracking-wider shadow mb-3">
+        🎮 Edisi Juara Kelas • 10 Tantangan
+      </div>
+
+      <h2 class="text-3xl sm:text-5xl font-bold text-amber-300 drop-shadow-[0_3px_0_rgba(0,0,0,0.4)] mb-2">
+        SIAP BALAPAN PECAHAN?
+      </h2>
+      <p class="text-sky-100 text-sm sm:text-base max-w-xl mx-auto mb-6 font-semibold">
+        Jawab soal penjumlahan dan pengurangan pecahan dengan tepat untuk memacu mobilmu melewati garis <b>FINISH</b> sebelum mobil lawan!
+      </p>
+
+      <!-- Pilih Mobil Pembalap -->
+      <div class="max-w-2xl mx-auto mb-6">
+        <p class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-sky-200 mb-3">
+          1. Pilih Mobil Andalanmu:
+        </p>
+        <div class="grid grid-cols-3 gap-2.5 sm:gap-4" id="carSelector">
+          <button type="button" onclick="selectCar('red')" data-car="red" class="car-choice active-car bg-amber-400/25 border-3 border-amber-300 rounded-2xl p-3 flex flex-col items-center transition transform hover:scale-105">
+            <div class="w-16 sm:w-20 h-10 mb-1 car-float" id="previewCarRed"></div>
+            <span class="font-extrabold text-xs sm:text-sm text-amber-300">Merah Kilat</span>
+          </button>
+          <button type="button" onclick="selectCar('yellow')" data-car="yellow" class="car-choice bg-white/10 border-2 border-white/20 rounded-2xl p-3 flex flex-col items-center transition transform hover:scale-105">
+            <div class="w-16 sm:w-20 h-10 mb-1" id="previewCarYellow"></div>
+            <span class="font-extrabold text-xs sm:text-sm text-white">Kuning Turbo</span>
+          </button>
+          <button type="button" onclick="selectCar('purple')" data-car="purple" class="car-choice bg-white/10 border-2 border-white/20 rounded-2xl p-3 flex flex-col items-center transition transform hover:scale-105">
+            <div class="w-16 sm:w-20 h-10 mb-1" id="previewCarPurple"></div>
+            <span class="font-extrabold text-xs sm:text-sm text-white">Ungu Roket</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pilih Kecepatan Lawan (Tingkat Tantangan) -->
+      <div class="max-w-2xl mx-auto mb-7">
+        <p class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-sky-200 mb-3">
+          2. Pilih Mode Balapan:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="modeSelector">
+          <button type="button" onclick="selectMode('santai')" data-mode="santai" class="mode-choice bg-white/10 border-2 border-white/20 rounded-2xl py-2.5 px-3 text-center transition">
+            <div class="font-black text-sm sm:text-base text-emerald-300">🌱 PEMULA</div>
+            <div class="text-xs text-sky-100">Lawan Santai • Fokus Belajar</div>
+          </button>
+          <button type="button" onclick="selectMode('juara')" data-mode="juara" class="mode-choice bg-amber-400/25 border-2 border-amber-300 rounded-2xl py-2.5 px-3 text-center transition">
+            <div class="font-black text-sm sm:text-base text-amber-300">🔥 TANTANGAN</div>
+            <div class="text-xs text-sky-100">Lawan Seimbang • Seru!</div>
+          </button>
+          <button type="button" onclick="selectMode('kilat')" data-mode="kilat" class="mode-choice bg-white/10 border-2 border-white/20 rounded-2xl py-2.5 px-3 text-center transition">
+            <div class="font-black text-sm sm:text-base text-rose-300">⚡ SUPER KILAT</div>
+            <div class="text-xs text-sky-100">Lawan Cepat • Pro Matematika</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tombol Mulai -->
+      <button onclick="prepareRace()" class="game-btn bg-gradient-to-b from-emerald-400 to-green-600 text-white font-display text-xl sm:text-2xl font-bold px-8 sm:px-12 py-4 rounded-2xl shadow-[0_6px_0_#065f46] inline-flex items-center gap-3">
+        <span>🏁</span> MULAI BALAPAN SEKARANG
+      </button>
+
+      <div class="mt-5 flex flex-wrap justify-center gap-4 text-xs sm:text-sm text-sky-200 font-bold">
+        <span>✅ Level: Mudah → Sedang → Sulit</span>
+        <span>🔥 Jawab Beruntun = Bonus Turbo!</span>
+        <span>📊 Dilengkapi Visual Pecahan</span>
+      </div>
+    </section>
+
+    <!-- ==================== 2. AREA BALAPAN ==================== -->
+    <section id="gameScreen" class="hidden space-y-3 sm:space-y-4">
+
+      <!-- Baris Atas: Navigasi & Statistik -->
+      <div class="bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 shadow-lg">
+        <button onclick="confirmExit()" class="game-btn bg-gradient-to-b from-rose-500 to-red-700 text-white text-xs sm:text-sm font-extrabold px-3.5 py-2 rounded-xl shadow-[0_3px_0_#7f1d1d]">
+          ⬅ KELUAR
+        </button>
+
+        <div class="grid grid-cols-4 gap-2 sm:gap-4 flex-1 max-w-2xl">
+          <div class="bg-slate-900/70 border border-sky-400/40 rounded-xl px-2 py-1.5 text-center">
+            <div class="text-[10px] sm:text-xs font-bold text-sky-300">🏆 SKOR</div>
+            <div id="statScore" class="font-display text-base sm:text-xl font-bold text-amber-300">0</div>
+          </div>
+          <div class="bg-slate-900/70 border border-sky-400/40 rounded-xl px-2 py-1.5 text-center">
+            <div class="text-[10px] sm:text-xs font-bold text-sky-300">🔥 STREAK</div>
+            <div id="statStreak" class="font-display text-base sm:text-xl font-bold text-orange-400">0x</div>
+          </div>
+          <div class="bg-slate-900/70 border border-sky-400/40 rounded-xl px-2 py-1.5 text-center">
+            <div class="text-[10px] sm:text-xs font-bold text-sky-300">📝 SOAL</div>
+            <div id="statNumber" class="font-display text-base sm:text-xl font-bold text-white">1/10</div>
+          </div>
+          <div class="bg-slate-900/70 border border-sky-400/40 rounded-xl px-2 py-1.5 text-center">
+            <div class="text-[10px] sm:text-xs font-bold text-sky-300">⏱️ WAKTU</div>
+            <div id="statTimer" class="font-display text-base sm:text-xl font-bold text-emerald-300">00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lintasan Balap -->
+      <div class="bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl p-3 sm:p-4 shadow-xl">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-extrabold mb-2">
+          <span class="text-amber-300 flex items-center gap-1.5">
+            🏎️ KAMU: <span id="playerPercent">0%</span>
+          </span>
+          <span id="raceStatusBadge" class="bg-slate-900/80 text-white px-3 py-0.5 rounded-full text-xs">
+            BALAPAN DIMULAI!
+          </span>
+          <span class="text-sky-300 flex items-center gap-1.5">
+            🚙 LAWAN AI: <span id="aiPercent">0%</span>
+          </span>
+        </div>
+
+        <!-- Track Visual -->
+        <div class="race-track-container">
+          <!-- Langit & Awan -->
+          <div class="sky-zone">
+            <svg class="cloud w-20 h-10" viewBox="0 0 100 50" fill="white">
+              <path d="M25,40 H75 A15,15 0 0,0 75,12 A20,20 0 0,0 38,10 A15,15 0 0,0 25,40 Z" />
+            </svg>
+            <svg class="cloud c2 w-24 h-12" viewBox="0 0 100 50" fill="white">
+              <path d="M25,40 H75 A15,15 0 0,0 75,12 A20,20 0 0,0 38,10 A15,15 0 0,0 25,40 Z" />
+            </svg>
+            <!-- Tribun / Bendera Kecil -->
+            <div class="absolute bottom-0 left-6 text-sm">🚩</div>
+            <div class="absolute bottom-0 left-1/3 text-sm">🌲</div>
+            <div class="absolute bottom-0 left-2/3 text-sm">🌲</div>
+            <div class="absolute bottom-0 right-12 text-sm">🏆</div>
+          </div>
+
+          <div class="grass-top"></div>
+
+          <!-- Jalan Aspal -->
+          <div id="asphaltRoad" class="asphalt-road">
+            <div class="lane-divider"></div>
+
+            <!-- Label Jalur -->
+            <span class="absolute left-3 top-2 text-[10px] font-black uppercase tracking-wider text-white/35">JALUR PEMBALAP</span>
+            <span class="absolute left-3 bottom-2 text-[10px] font-black uppercase tracking-wider text-white/35">JALUR LAWAN AI</span>
+
+            <!-- Garis Finish -->
+            <div class="finish-line"></div>
+            <div class="absolute right-11 top-1/2 -translate-y-1/2 text-amber-300 font-black text-xs tracking-widest [writing-mode:vertical-rl] drop-shadow">
+              FINISH
+            </div>
+
+            <!-- Mobil Pemain -->
+            <div id="playerCar" class="racer-wrapper racer-player car-idle">
+              <!-- SVG Mobil di-render lewat JS -->
+            </div>
+
+            <!-- Mobil Lawan AI -->
+            <div id="aiCar" class="racer-wrapper racer-ai car-idle">
+              <!-- SVG Mobil AI di-render lewat JS -->
+            </div>
+          </div>
+
+          <div class="grass-bottom"></div>
+        </div>
+      </div>
+
+      <!-- Area Soal Matematika -->
+      <div class="bg-white/10 backdrop-blur-md border-2 border-white/25 rounded-3xl p-4 sm:p-6 shadow-2xl text-center relative">
+        <!-- Header Soal: Badge Level & Tombol Bantuan Visual -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <span id="levelBadge" class="bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm px-4 py-1 rounded-full uppercase tracking-wider shadow">
+            LEVEL: MUDAH
+          </span>
+
+          <button type="button" onclick="toggleVisualHint()" id="hintBtn" class="game-btn bg-sky-500/30 hover:bg-sky-500/50 border border-sky-300/60 text-sky-100 text-xs sm:text-sm font-extrabold px-3.5 py-1.5 rounded-full flex items-center gap-1.5">
+            <span>👁️</span> <span id="hintBtnText">Lihat Gambar Pecahan</span>
+          </button>
+        </div>
+
+        <!-- Teks Soal dengan Pecahan Bertumpuk -->
+        <div id="questionBox" class="bg-slate-900/65 border-2 border-white/15 rounded-2xl py-4 px-3 sm:py-5 sm:px-6 mb-4">
+          <p class="text-xs sm:text-sm text-sky-300 font-bold mb-1">Hitunglah hasil operasi pecahan berikut:</p>
+          <div id="questionDisplay" class="text-2xl sm:text-4xl font-black text-white tracking-wide flex items-center justify-center flex-wrap">
+            <!-- Soal di-render di sini -->
+          </div>
+
+          <!-- Bantuan Visual Balok Pecahan (Tersembunyi secara default, bisa diklik anak SD) -->
+          <div id="visualHintArea" class="hidden mt-4 pt-3 border-t border-white/15">
+            <p class="text-xs text-amber-300 font-bold mb-2">💡 Ilustrasi Bagian Pecahan:</p>
+            <div id="visualBars" class="flex flex-wrap items-center justify-center gap-3"></div>
+          </div>
+        </div>
+
+        <!-- 4 Pilihan Jawaban -->
+        <div id="optionsGrid" class="grid grid-cols-2 gap-3 sm:gap-4 max-w-2xl mx-auto">
+          <!-- Tombol opsi di-render lewat JS -->
+        </div>
+
+        <!-- Umpan Balik & Pembahasan -->
+        <div id="feedbackBox" class="mt-4 min-h-[64px] rounded-2xl p-3 bg-slate-950/40 border border-white/10 flex flex-col items-center justify-center">
+          <p class="text-sky-200 font-bold text-sm sm:text-base">
+            Pilih jawaban yang paling tepat untuk melaju! (Bisa tekan tombol 1–4 di keyboard)
+          </p>
+        </div>
+
+        <!-- Tombol Lanjut -->
+        <div class="mt-4">
+          <button id="nextBtn" onclick="nextQuestion()" class="hidden game-btn bg-gradient-to-b from-amber-300 to-amber-500 text-slate-950 font-display text-lg sm:text-xl font-bold px-8 py-3 rounded-2xl shadow-[0_5px_0_#b45309]">
+            SOAL BERIKUTNYA ➜
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. LAYAR HASIL AKHIR ==================== -->
+    <section id="resultScreen" class="hidden bg-white/10 backdrop-blur-md border-2 border-white/25 rounded-3xl p-6 sm:p-8 shadow-2xl text-center relative overflow-hidden">
+      <canvas id="confettiCanvas" class="absolute inset-0 pointer-events-none w-full h-full"></canvas>
+
+      <div class="relative z-10">
+        <div id="resultTrophy" class="text-6xl sm:text-7xl mb-2 animate-bounce">🏆</div>
+        <h2 id="resultTitle" class="text-3xl sm:text-5xl font-bold text-amber-300 drop-shadow-[0_3px_0_rgba(0,0,0,0.4)] mb-1">
+          JUARA BALAPAN!
+        </h2>
+        <p id="resultSubtitle" class="text-sky-100 text-sm sm:text-lg font-bold mb-6">
+          Hebat! Kamu berhasil mengalahkan lawan dan menaklukkan pecahan!
+        </p>
+
+        <!-- Perbandingan Posisi Akhir -->
+        <div class="max-w-md mx-auto bg-slate-900/70 border border-white/20 rounded-2xl p-4 mb-6">
+          <div class="flex justify-between items-center text-sm font-extrabold mb-2">
+            <span class="text-amber-300">🏎️ Jarak Kamu: <span id="finalPlayerDist">100%</span></span>
+            <span class="text-sky-300">🚙 Lawan AI: <span id="finalAiDist">80%</span></span>
+          </div>
+          <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden mb-1">
+            <div id="finalPlayerBar" class="bg-gradient-to-r from-amber-400 to-emerald-400 h-full rounded-full" style="width: 100%"></div>
+          </div>
+          <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+            <div id="finalAiBar" class="bg-sky-500 h-full rounded-full" style="width: 80%"></div>
+          </div>
+        </div>
+
+        <!-- 4 Kartu Statistik -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto mb-7">
+          <div class="bg-slate-900/75 border-2 border-amber-400/50 rounded-2xl p-3">
+            <div class="text-xs text-sky-200 font-bold">SKOR AKHIR</div>
+            <div id="finalScore" class="font-display text-2xl sm:text-3xl font-bold text-amber-300">0</div>
+          </div>
+          <div class="bg-slate-900/75 border-2 border-emerald-400/50 rounded-2xl p-3">
+            <div class="text-xs text-sky-200 font-bold">BENAR</div>
+            <div id="finalCorrect" class="font-display text-2xl sm:text-3xl font-bold text-emerald-400">0</div>
+          </div>
+          <div class="bg-slate-900/75 border-2 border-rose-400/50 rounded-2xl p-3">
+            <div class="text-xs text-sky-200 font-bold">SALAH</div>
+            <div id="finalWrong" class="font-display text-2xl sm:text-3xl font-bold text-rose-400">0</div>
+          </div>
+          <div class="bg-slate-900/75 border-2 border-sky-400/50 rounded-2xl p-3">
+            <div class="text-xs text-sky-200 font-bold">WAKTU</div>
+            <div id="finalTime" class="font-display text-2xl sm:text-3xl font-bold text-sky-300">00:00</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3">
+          <button onclick="prepareRace()" class="game-btn bg-gradient-to-b from-emerald-400 to-green-600 text-white font-display text-lg sm:text-xl font-bold px-7 py-3.5 rounded-2xl shadow-[0_5px_0_#065f46]">
+            🔄 BALAPAN LAGI
+          </button>
+          <button onclick="goHome()" class="game-btn bg-gradient-to-b from-sky-400 to-blue-600 text-white font-display text-lg sm:text-xl font-bold px-7 py-3.5 rounded-2xl shadow-[0_5px_0_#1e3a8a]">
+            🏠 MENU UTAMA
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- OVERLAY COUNTDOWN (3, 2, 1, MULAI!) -->
+  <div id="countdownOverlay" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+    <div id="countdownNumber" class="font-display text-7xl sm:text-9xl font-bold text-amber-300 drop-shadow-[0_6px_0_#b45309] animate-ping">
+      3
+    </div>
+    <p class="text-white font-extrabold text-lg sm:text-2xl mt-6 tracking-wider">BERSIAP DI GARIS START...</p>
+  </div>
+
+  <!-- MODAL KONFIRMASI KELUAR (Pengganti confirm() bawaan browser) -->
+  <div id="exitModal" class="hidden fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-white/25 rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl">
+      <div class="text-4xl mb-2">🛑</div>
+      <h3 class="text-2xl font-bold text-amber-300 mb-2">Hentikan Balapan?</h3>
+      <p class="text-sm text-sky-100 mb-5">Progres balapan saat ini akan hilang jika kamu kembali ke menu utama.</p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="closeExitModal()" class="game-btn flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl">
+          LANJUT MAIN
+        </button>
+        <button onclick="goHome()" class="game-btn flex-1 bg-rose-600 hover:bg-rose-500 text-white font-bold py-2.5 rounded-xl">
+          YA, KELUAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFIKASI RINGAN -->
+  <div id="toastMsg" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900/95 border border-amber-300/60 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+    Pesan notifikasi
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * SVG GENERATOR MOBIL BALAP (Menghadap ke kanan agar sesuai arah lintasan)
+     * ============================================================================
+     */
+    function createCarSVG(palette = 'red', withFlame = true) {
+      const colors = {
+        red: { body: '#ef4444', dark: '#991b1b', stripe: '#fde047', visor: '#38bdf8' },
+        yellow: { body: '#f59e0b', dark: '#92400e', stripe: '#ffffff', visor: '#0ea5e9' },
+        purple: { body: '#8b5cf6', dark: '#4c1d95', stripe: '#34d399', visor: '#fef08a' },
+        blueAI: { body: '#0284c7', dark: '#0c4a6e', stripe: '#f8fafc', visor: '#fb7185' }
+      };
+      const c = colors[palette] || colors.red;
+
+      return `
+        <svg viewBox="0 0 140 65" class="w-full h-auto overflow-visible">
+          ${withFlame ? `
+          <!-- Api Nitro di Belakang Mobil -->
+          <g class="nitro-flame">
+            <polygon points="18,32 -18,24 -6,33 -22,40 -5,43 -14,50 18,45" fill="#f97316" />
+            <polygon points="18,34 -6,29 2,36 -8,41 18,43" fill="#fde047" />
+          </g>` : ''}
+          <!-- Spoiler Belakang -->
+          <path d="M12,18 L24,18 L28,32 L16,32 Z" fill="${c.dark}" />
+          <rect x="8" y="14" width="18" height="5" rx="2" fill="${c.stripe}" />
+          <!-- Bodi Utama Mobil -->
+          <path d="M16,32 Q22,22 48,22 L72,14 Q92,14 104,25 L128,30 Q136,33 135,43 L132,48 L14,48 Q10,40 16,32 Z"
+                fill="${c.body}" stroke="${c.dark}" stroke-width="2.5" />
+          <!-- Garis Balap -->
+          <path d="M24,35 L132,37 L130,42 L20,41 Z" fill="${c.stripe}" />
+          <!-- Kokpit & Helm Pembalap -->
+          <path d="M56,22 L72,16 Q86,16 94,24 L56,24 Z" fill="#1e293b" />
+          <circle cx="74" cy="21" r="6" fill="#ffffff" />
+          <path d="M75,18 L80,19 L79,22 L74,22 Z" fill="${c.visor}" />
+          <!-- Roda Belakang & Depan -->
+          <g>
+            <circle cx="36" cy="49" r="12" fill="#111827" stroke="#374151" stroke-width="2" />
+            <circle cx="36" cy="49" r="5.5" fill="#9ca3af" />
+            <circle cx="36" cy="49" r="2" fill="#111827" />
+          </g>
+          <g>
+            <circle cx="106" cy="49" r="12" fill="#111827" stroke="#374151" stroke-width="2" />
+            <circle cx="106" cy="49" r="5.5" fill="#9ca3af" />
+            <circle cx="106" cy="49" r="2" fill="#111827" />
+          </g>
+        </svg>
+      `;
+    }
+
+    /**
+     * ============================================================================
+     * BANK SOAL PECAHAN SD (Terstruktur: Mudah, Sedang, Sulit)
+     * Setiap soal memiliki:
+     * - parts: array token ekspresi matematika (bisa pecahan {n, d} atau operator '+'/'-' atau angka bulat)
+     * - options: 4 pilihan jawaban
+     * - correctIndex: indeks jawaban benar pada array options
+     * - level: 'MUDAH' | 'SEDANG' | 'SULIT'
+     * - explanation: penjelasan langkah demi langkah yang ramah anak SD
+     * - visual: data untuk menampilkan balok ilustrasi pecahan
+     * ============================================================================
+     */
+    const QUESTION_BANK = {
+      MUDAH: [
+        {
+          parts: [{ n: 1, d: 5 }, '+', { n: 2, d: 5 }],
+          options: ['3/5', '3/10', '2/5', '1/5'],
+          correctIndex: 0,
+          level: 'MUDAH',
+          explanation: 'Penyebut sudah sama (5), cukup jumlahkan pembilang: 1 + 2 = 3. Jadi hasilnya 3/5.',
+          visual: [{ n: 1, d: 5, label: '1/5' }, { n: 2, d: 5, label: '2/5' }]
+        },
+        {
+          parts: [{ n: 4, d: 7 }, '-', { n: 2, d: 7 }],
+          options: ['2/7', '6/7', '2/14', '3/7'],
+          correctIndex: 0,
+          level: 'MUDAH',
+          explanation: 'Penyebut sudah sama (7), kurangi pembilangnya: 4 - 2 = 2. Hasilnya 2/7.',
+          visual: [{ n: 4, d: 7, label: '4/7' }, { n: 2, d: 7, label: '2/7' }]
+        },
+        {
+          parts: [{ n: 2, d: 6 }, '+', { n: 3, d: 6 }],
+          options: ['5/6', '5/12', '1/6', '6/6'],
+          correctIndex: 0,
+          level: 'MUDAH',
+          explanation: 'Pembilang dijumlahkan: 2 + 3 = 5, sedangkan penyebut tetap 6. Hasilnya 5/6.',
+          visual: [{ n: 2, d: 6, label: '2/6' }, { n: 3, d: 6, label: '3/6' }]
+        },
+        {
+          parts: [{ n: 5, d: 8 }, '-', { n: 3, d: 8 }],
+          options: ['2/8', '8/8', '2/16', '3/8'],
+          correctIndex: 0,
+          level: 'MUDAH',
+          explanation: 'Kurangi pembilang: 5 - 3 = 2, penyebut tetap 8. Jadi hasilnya 2/8.',
+          visual: [{ n: 5, d: 8, label: '5/8' }, { n: 3, d: 8, label: '3/8' }]
+        },
+        {
+          parts: [{ n: 1, d: 4 }, '+', { n: 2, d: 4 }],
+          options: ['3/4', '3/8', '2/4', '1/4'],
+          correctIndex: 0,
+          level: 'MUDAH',
+          explanation: '1 bagian ditambah 2 bagian dari 4 bagian sama dengan 3/4.',
+          visual: [{ n: 1, d: 4, label: '1/4' }, { n: 2, d: 4, label: '2/4' }]
+        }
+      ],
+      SEDANG: [
+        {
+          parts: [{ n: 3, d: 10 }, '+', { n: 4, d: 10 }],
+          options: ['7/10', '7/20', '1/10', '6/10'],
+          correctIndex: 0,
+          level: 'SEDANG',
+          explanation: 'Penyebut sama-sama 10. Jumlahkan pembilang: 3 + 4 = 7, sehingga menjadi 7/10.',
+          visual: [{ n: 3, d: 10, label: '3/10' }, { n: 4, d: 10, label: '4/10' }]
+        },
+        {
+          parts: [{ n: 8, d: 12 }, '-', { n: 3, d: 12 }],
+          options: ['5/12', '5/24', '11/12', '4/12'],
+          correctIndex: 0,
+          level: 'SEDANG',
+          explanation: 'Penyebut tetap 12. Kurangi pembilang: 8 - 3 = 5. Jadi jawabannya 5/12.',
+          visual: [{ n: 8, d: 12, label: '8/12' }, { n: 3, d: 12, label: '3/12' }]
+        },
+        {
+          parts: [{ n: 4, d: 11 }, '+', { n: 5, d: 11 }],
+          options: ['9/11', '9/22', '1/11', '8/11'],
+          correctIndex: 0,
+          level: 'SEDANG',
+          explanation: 'Jumlahkan pembilang: 4 + 5 = 9, penyebut tetap 11. Hasilnya 9/11.',
+          visual: [{ n: 4, d: 11, label: '4/11' }, { n: 5, d: 11, label: '5/11' }]
+        },
+        {
+          parts: ['1', '-', { n: 2, d: 5 }],
+          options: ['3/5', '1/5', '2/5', '4/5'],
+          correctIndex: 0,
+          level: 'SEDANG',
+          explanation: 'Angka 1 utuh sama dengan 5/5. Maka 5/5 - 2/5 = 3/5.',
+          visual: [{ n: 5, d: 5, label: '1 = 5/5' }, { n: 2, d: 5, label: '2/5' }]
+        },
+        {
+          parts: [{ n: 7, d: 9 }, '-', { n: 4, d: 9 }],
+          options: ['3/9', '11/9', '3/18', '2/9'],
+          correctIndex: 0,
+          level: 'SEDANG',
+          explanation: 'Kurangi pembilangnya: 7 - 4 = 3, penyebut tetap 9. Hasilnya 3/9.',
+          visual: [{ n: 7, d: 9, label: '7/9' }, { n: 4, d: 9, label: '4/9' }]
+        }
+      ],
+      SULIT: [
+        {
+          parts: [{ n: 9, d: 13 }, '+', { n: 3, d: 13 }, '-', { n: 4, d: 13 }],
+          options: ['8/13', '8/39', '16/13', '6/13'],
+          correctIndex: 0,
+          level: 'SULIT',
+          explanation: 'Hitung dari kiri ke kanan: (9 + 3) - 4 = 12 - 4 = 8. Penyebut tetap 13, hasilnya 8/13.',
+          visual: [{ n: 9, d: 13, label: '9/13' }, { n: 8, d: 13, label: 'Hasil 8/13' }]
+        },
+        {
+          parts: [{ n: 1, d: 2 }, '+', { n: 1, d: 4 }],
+          options: ['3/4', '2/6', '2/4', '1/4'],
+          correctIndex: 0,
+          level: 'SULIT',
+          explanation: 'Samakan penyebut menjadi 4: 1/2 = 2/4. Lalu jumlahkan: 2/4 + 1/4 = 3/4.',
+          visual: [{ n: 1, d: 2, label: '1/2 = 2/4' }, { n: 1, d: 4, label: '1/4' }]
+        },
+        {
+          parts: [{ n: 3, d: 4 }, '-', { n: 1, d: 2 }],
+          options: ['1/4', '2/2', '2/4', '1/2'],
+          correctIndex: 0,
+          level: 'SULIT',
+          explanation: 'Samakan penyebut menjadi 4: 1/2 = 2/4. Lalu kurangi: 3/4 - 2/4 = 1/4.',
+          visual: [{ n: 3, d: 4, label: '3/4' }, { n: 1, d: 2, label: '1/2 = 2/4' }]
+        },
+        {
+          parts: [{ n: 7, d: 15 }, '+', { n: 6, d: 15 }],
+          options: ['13/15', '13/30', '1/15', '12/15'],
+          correctIndex: 0,
+          level: 'SULIT',
+          explanation: 'Jumlahkan pembilang: 7 + 6 = 13, penyebut tetap 15. Hasilnya 13/15.',
+          visual: [{ n: 7, d: 15, label: '7/15' }, { n: 6, d: 15, label: '6/15' }]
+        },
+        {
+          parts: [{ n: 14, d: 18 }, '-', { n: 5, d: 18 }],
+          options: ['9/18', '9/36', '19/18', '7/18'],
+          correctIndex: 0,
+          level: 'SULIT',
+          explanation: '14 - 5 = 9. Hasilnya 9/18 (yang juga senilai dengan 1/2).',
+          visual: [{ n: 14, d: 18, label: '14/18' }, { n: 5, d: 18, label: '5/18' }]
+        }
+      ]
+    };
+
+    /**
+     * ============================================================================
+     * STATE PERMAINAN
+     * ============================================================================
+     */
+    const state = {
+      selectedCar: 'red',
+      mode: 'juara', // 'santai' | 'juara' | 'kilat'
+      soundOn: true,
+      quiz: [],
+      currentIndex: 0,
+      score: 0,
+      streak: 0,
+      correct: 0,
+      wrong: 0,
+      seconds: 0,
+      playerPos: 0, // 0 sampai 100 (%)
+      aiPos: 0,     // 0 sampai 100 (%)
+      locked: false,
+      timerInterval: null,
+      aiInterval: null
+    };
+
+    // Kecepatan maju mobil lawan AI per detik berdasarkan mode
+    const AI_SPEED_MAP = {
+      santai: 0.42, // ~238 detik untuk finish
+      juara: 0.72,  // ~138 detik untuk finish
+      kilat: 1.05   // ~95 detik untuk finish
+    };
+
+    /**
+     * ============================================================================
+     * INISIALISASI AWAL
+     * ============================================================================
+     */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Render preview mobil di menu utama
+      document.getElementById('previewCarRed').innerHTML = createCarSVG('red', false);
+      document.getElementById('previewCarYellow').innerHTML = createCarSVG('yellow', false);
+      document.getElementById('previewCarPurple').innerHTML = createCarSVG('purple', false);
+
+      // Dukungan keyboard (tombol 1-4 / A-D untuk menjawab, Enter untuk soal berikutnya)
+      document.addEventListener('keydown', (e) => {
+        const gameVisible = !document.getElementById('gameScreen').classList.contains('hidden');
+        if (!gameVisible) return;
+
+        const keyMap = { '1': 0, '2': 1, '3': 2, '4': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+        const key = e.key.toLowerCase();
+
+        if (key in keyMap && !state.locked) {
+          const btns = document.querySelectorAll('#optionsGrid button');
+          if (btns[keyMap[key]]) btns[keyMap[key]].click();
+        } else if ((e.key === 'Enter' || e.key === ' ') && state.locked) {
+          const nextBtn = document.getElementById('nextBtn');
+          if (!nextBtn.classList.contains('hidden')) {
+            e.preventDefault();
+            nextBtn.click();
+          }
+        }
+      });
+    });
+
+    /**
+     * ============================================================================
+     * PILIH MOBIL & MODE DI MENU UTAMA
+     * ============================================================================
+     */
+    function selectCar(carColor) {
+      state.selectedCar = carColor;
+      playTone('click');
+      document.querySelectorAll('.car-choice').forEach((btn) => {
+        const isSelected = btn.dataset.car === carColor;
+        btn.className = isSelected
+          ? 'car-choice bg-amber-400/25 border-3 border-amber-300 rounded-2xl p-3 flex flex-col items-center transition transform scale-105'
+          : 'car-choice bg-white/10 border-2 border-white/20 rounded-2xl p-3 flex flex-col items-center transition transform hover:scale-105';
+        const previewDiv = btn.querySelector('div');
+        if (isSelected) previewDiv.classList.add('car-float');
+        else previewDiv.classList.remove('car-float');
+      });
+    }
+
+    function selectMode(modeName) {
+      state.mode = modeName;
+      playTone('click');
+      document.querySelectorAll('.mode-choice').forEach((btn) => {
+        const isSelected = btn.dataset.mode === modeName;
+        btn.className = isSelected
+          ? 'mode-choice bg-amber-400/25 border-2 border-amber-300 rounded-2xl py-2.5 px-3 text-center transition'
+          : 'mode-choice bg-white/10 border-2 border-white/20 rounded-2xl py-2.5 px-3 text-center transition';
+      });
+    }
+
+    /**
+     * ============================================================================
+     * PERSIAPAN & COUNTDOWN MULAI BALAPAN
+     * ============================================================================
+     */
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildProgressiveQuiz() {
+      // Ambil 3 soal MUDAH, 4 soal SEDANG, 3 soal SULIT secara bertahap
+      const easy = shuffleArray(QUESTION_BANK.MUDAH).slice(0, 3);
+      const medium = shuffleArray(QUESTION_BANK.SEDANG).slice(0, 4);
+      const hard = shuffleArray(QUESTION_BANK.SULIT).slice(0, 3);
+      return [...easy, ...medium, ...hard];
+    }
+
+    function prepareRace() {
+      clearIntervals();
+      state.quiz = buildProgressiveQuiz();
+      state.currentIndex = 0;
+      state.score = 0;
+      state.streak = 0;
+      state.correct = 0;
+      state.wrong = 0;
+      state.seconds = 0;
+      state.playerPos = 0;
+      state.aiPos = 0;
+      state.locked = false;
+
+      // Render mobil pemain & AI di lintasan
+      document.getElementById('playerCar').innerHTML = createCarSVG(state.selectedCar, true);
+      document.getElementById('aiCar').innerHTML = createCarSVG('blueAI', false);
+      updateTrackPositions();
+
+      // Pindah layar ke arena game
+      document.getElementById('homeScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+
+      updateHUD();
+      renderQuestion();
+
+      // Jalankan Countdown 3.. 2.. 1.. GAS!
+      const overlay = document.getElementById('countdownOverlay');
+      const countNum = document.getElementById('countdownNumber');
+      overlay.classList.remove('hidden');
+
+      let count = 3;
+      countNum.textContent = count;
+      playTone('beep');
+
+      const cdTimer = setInterval(() => {
+        count--;
+        if (count > 0) {
+          countNum.textContent = count;
+          playTone('beep');
+        } else if (count === 0) {
+          countNum.textContent = 'GAS! 🏁';
+          playTone('go');
+        } else {
+          clearInterval(cdTimer);
+          overlay.classList.add('hidden');
+          startRaceLoop();
+        }
+      }, 650);
+    }
+
+    function startRaceLoop() {
+      document.getElementById('asphaltRoad').classList.remove('paused');
+
+      // Timer waktu permainan (detik)
+      state.timerInterval = setInterval(() => {
+        state.seconds++;
+        document.getElementById('statTimer').textContent = formatTime(state.seconds);
+      }, 1000);
+
+      // Pergerakan mulus mobil lawan AI setiap 250ms
+      const speedPerTick = AI_SPEED_MAP[state.mode] / 4;
+      state.aiInterval = setInterval(() => {
+        if (state.aiPos < 100) {
+          // Sedikit variasi kecepatan AI agar terasa alami
+          const jitter = 0.85 + Math.random() * 0.3;
+          state.aiPos = Math.min(100, state.aiPos + speedPerTick * jitter);
+          updateTrackPositions();
+        }
+      }, 250);
+    }
+
+    function clearIntervals() {
+      if (state.timerInterval) clearInterval(state.timerInterval);
+      if (state.aiInterval) clearInterval(state.aiInterval);
+      state.timerInterval = null;
+      state.aiInterval = null;
+    }
+
+    /**
+     * ============================================================================
+     * RENDER SOAL, PECAHAN BERTUMPUK & BANTUAN VISUAL
+     * ============================================================================
+     */
+    function formatFractionHTML(str) {
+      // Mengubah teks "3/5" menjadi tampilan pecahan bertumpuk HTML
+      if (typeof str === 'string' && str.includes('/')) {
+        const [top, bottom] = str.split('/');
+        return `<span class="frac"><span class="frac-top">${top}</span><span class="frac-bottom">${bottom}</span></span>`;
+      }
+      return `<span>${str}</span>`;
+    }
+
+    function renderQuestion() {
+      state.locked = false;
+      const item = state.quiz[state.currentIndex];
+
+      // Update Badge Tingkat Kesulitan
+      const levelBadge = document.getElementById('levelBadge');
+      levelBadge.textContent = `LEVEL: ${item.level}`;
+      if (item.level === 'MUDAH') {
+        levelBadge.className = 'bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm px-4 py-1 rounded-full uppercase tracking-wider shadow';
+      } else if (item.level === 'SEDANG') {
+        levelBadge.className = 'bg-amber-400 text-slate-950 font-black text-xs sm:text-sm px-4 py-1 rounded-full uppercase tracking-wider shadow';
+      } else {
+        levelBadge.className = 'bg-rose-500 text-white font-black text-xs sm:text-sm px-4 py-1 rounded-full uppercase tracking-wider shadow';
+      }
+
+      // Render Soal Bertumpuk
+      const qHTML = item.parts
+        .map((part) => {
+          if (typeof part === 'object') {
+            return `<span class="frac"><span class="frac-top">${part.n}</span><span class="frac-bottom">${part.d}</span></span>`;
+          }
+          return `<span class="math-op">${part}</span>`;
+        })
+        .join('') + `<span class="math-op">=</span><span class="text-amber-300">?</span>`;
+
+      document.getElementById('questionDisplay').innerHTML = qHTML;
+
+      // Reset Bantuan Visual Pecahan
+      const visualHintArea = document.getElementById('visualHintArea');
+      visualHintArea.classList.add('hidden');
+      document.getElementById('hintBtnText').textContent = 'Lihat Gambar Pecahan';
+      renderVisualBars(item.visual);
+
+      // Render 4 Pilihan Jawaban (diacak posisinya dengan aman)
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
+
+      const mappedOptions = item.options.map((optText, idx) => ({
+        text: optText,
+        isCorrect: idx === item.correctIndex
+      }));
+      const shuffledOptions = shuffleArray(mappedOptions);
+
+      const letters = ['A', 'B', 'C', 'D'];
+      shuffledOptions.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option-card rounded-2xl py-3 px-3 sm:py-4 sm:px-5 flex items-center justify-center gap-3 text-xl sm:text-2xl font-black';
+        btn.dataset.correct = opt.isCorrect ? 'true' : 'false';
+        btn.innerHTML = `
+          <span class="bg-sky-900/15 text-sky-950 text-sm sm:text-base font-black w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0">
+            ${letters[idx]}
+          </span>
+          <div>${formatFractionHTML(opt.text)}</div>
+        `;
+        btn.onclick = () => handleAnswer(btn, opt.isCorrect, item);
+        optionsGrid.appendChild(btn);
+      });
+
+      // Reset Feedback & Tombol Lanjut
+      document.getElementById('feedbackBox').innerHTML = `
+        <p class="text-sky-200 font-bold text-sm sm:text-base">
+          Pilih jawaban yang tepat untuk melaju!
+        </p>
+      `;
+      document.getElementById('nextBtn').classList.add('hidden');
+      updateHUD();
+    }
+
+    function renderVisualBars(visualList) {
+      const container = document.getElementById('visualBars');
+      container.innerHTML = '';
+      if (!visualList) return;
+
+      visualList.forEach((v) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bg-slate-800/90 border border-white/15 rounded-xl p-2 flex flex-col items-center';
+
+        const bar = document.createElement('div');
+        bar.className = 'flex gap-0.5 h-5 w-36 sm:w-44 bg-slate-950 p-0.5 rounded';
+
+        for (let i = 0; i < v.d; i++) {
+          const seg = document.createElement('div');
+          seg.className = i < v.n
+            ? 'flex-1 bg-amber-400 rounded-xs'
+            : 'flex-1 bg-slate-700/60 rounded-xs';
+          bar.appendChild(seg);
+        }
+
+        const label = document.createElement('span');
+        label.className = 'text-xs font-extrabold text-sky-200 mt-1';
+        label.textContent = v.label;
+
+        wrapper.appendChild(bar);
+        wrapper.appendChild(label);
+        container.appendChild(wrapper);
+      });
+    }
+
+    function toggleVisualHint() {
+      const area = document.getElementById('visualHintArea');
+      const txt = document.getElementById('hintBtnText');
+      const isHidden = area.classList.contains('hidden');
+      if (isHidden) {
+        area.classList.remove('hidden');
+        txt.textContent = 'Sembunyikan Gambar';
+        playTone('click');
+      } else {
+        area.classList.add('hidden');
+        txt.textContent = 'Lihat Gambar Pecahan';
+      }
+    }
+
+    /**
+     * ============================================================================
+     * LOGIKA JAWABAN & PERGERAKAN MOBIL
+     * ============================================================================
+     */
+    function handleAnswer(selectedBtn, isCorrect, item) {
+      if (state.locked) return;
+      state.locked = true;
+
+      const allButtons = document.querySelectorAll('#optionsGrid button');
+      allButtons.forEach((btn) => {
+        btn.disabled = true;
+        if (btn.dataset.correct === 'true') {
+          btn.classList.add('correct');
+        }
+      });
+
+      const playerCarEl = document.getElementById('playerCar');
+
+      if (isCorrect) {
+        state.correct++;
+        state.streak++;
+
+        // Bonus skor jika jawaban benar beruntun (Streak)
+        const streakBonus = state.streak >= 2 ? (state.streak - 1) * 25 : 0;
+        const gainedPoints = 100 + streakBonus;
+        state.score += gainedPoints;
+
+        // Maju tepat 10% per soal benar agar 10 soal = 100% garis finish
+        state.playerPos = Math.min(100, state.playerPos + 10);
+        updateTrackPositions();
+
+        // Efek Nitro & Boost Mobil
+        playerCarEl.classList.add('car-boost', 'nitro-active');
+        setTimeout(() => {
+          playerCarEl.classList.remove('car-boost', 'nitro-active');
+        }, 950);
+
+        playTone(state.streak >= 2 ? 'turbo' : 'correct');
+
+        const streakText = state.streak >= 2
+          ? `<span class="inline-block bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full ml-1">🔥 TURBO ${state.streak}x (+${streakBonus} Bonus)</span>`
+          : '';
+
+        document.getElementById('feedbackBox').innerHTML = `
+          <div class="text-emerald-300 font-black text-base sm:text-lg mb-1">
+            🎉 TEPAT SEKALI! +${gainedPoints} POIN ${streakText}
+          </div>
+          <p class="text-white/95 text-xs sm:text-sm font-semibold">${item.explanation}</p>
+        `;
+      } else {
+        state.wrong++;
+        state.streak = 0;
+        selectedBtn.classList.add('wrong');
+        playTone('wrong');
+
+        document.getElementById('feedbackBox').innerHTML = `
+          <div class="text-rose-300 font-black text-base sm:text-lg mb-1">
+            ❌ KURANG TEPAT! Mobil tertahan sebentar.
+          </div>
+          <p class="text-white/95 text-xs sm:text-sm font-semibold">${item.explanation}</p>
+        `;
+      }
+
+      updateHUD();
+
+      const nextBtn = document.getElementById('nextBtn');
+      nextBtn.classList.remove('hidden');
+      nextBtn.textContent = state.currentIndex === state.quiz.length - 1
+        ? 'LIHAT PODIUM JUARA 🏁'
+        : 'SOAL BERIKUTNYA ➜';
+    }
+
+    function nextQuestion() {
+      if (state.currentIndex < state.quiz.length - 1) {
+        state.currentIndex++;
+        renderQuestion();
+      } else {
+        finishRace();
+      }
+    }
+
+    /**
+     * ============================================================================
+     * PEMBARUAN POSISI LINTASAN & HUD
+     * ============================================================================
+     */
+    function updateTrackPositions() {
+      // Petakan 0-100% ke posisi kiri visual lintasan (2% sampai 84% agar pas di garis finish)
+      const maxVisualLeft = window.innerWidth < 640 ? 78 : 85;
+      const pLeft = 2 + (state.playerPos / 100) * (maxVisualLeft - 2);
+      const aLeft = 2 + (state.aiPos / 100) * (maxVisualLeft - 2);
+
+      document.getElementById('playerCar').style.left = `${pLeft}%`;
+      document.getElementById('aiCar').style.left = `${aLeft}%`;
+
+      document.getElementById('playerPercent').textContent = `${Math.round(state.playerPos)}%`;
+      document.getElementById('aiPercent').textContent = `${Math.round(state.aiPos)}%`;
+
+      const badge = document.getElementById('raceStatusBadge');
+      if (state.playerPos > state.aiPos + 5) {
+        badge.textContent = '🚀 KAMU MEMIMPIN!';
+        badge.className = 'bg-emerald-500/90 text-slate-950 font-black px-3 py-0.5 rounded-full text-xs';
+      } else if (state.aiPos > state.playerPos + 5) {
+        badge.textContent = '⚠️ LAWAN MENYALIP! AYO KEJAR!';
+        badge.className = 'bg-rose-500/90 text-white font-black px-3 py-0.5 rounded-full text-xs';
+      } else {
+        badge.textContent = '⚡ PERSAINGAN KETAT!';
+        badge.className = 'bg-amber-400/90 text-slate-950 font-black px-3 py-0.5 rounded-full text-xs';
+      }
+    }
+
+    function updateHUD() {
+      document.getElementById('statScore').textContent = state.score;
+      document.getElementById('statStreak').textContent = `${state.streak}x`;
+      document.getElementById('statNumber').textContent = `${state.currentIndex + 1}/${state.quiz.length}`;
+      document.getElementById('statTimer').textContent = formatTime(state.seconds);
+    }
+
+    function formatTime(totalSec) {
+      const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+      const s = String(totalSec % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    /**
+     * ============================================================================
+     * LAYAR HASIL AKHIR & KONFETI PERAYAAN
+     * ============================================================================
+     */
+    function finishRace() {
+      clearIntervals();
+      document.getElementById('asphaltRoad').classList.add('paused');
+
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      const pDist = Math.round(state.playerPos);
+      const aDist = Math.round(state.aiPos);
+
+      document.getElementById('finalPlayerDist').textContent = `${pDist}%`;
+      document.getElementById('finalAiDist').textContent = `${aDist}%`;
+      document.getElementById('finalPlayerBar').style.width = `${pDist}%`;
+      document.getElementById('finalAiBar').style.width = `${aDist}%`;
+
+      document.getElementById('finalScore').textContent = state.score;
+      document.getElementById('finalCorrect').textContent = `${state.correct}/10`;
+      document.getElementById('finalWrong').textContent = state.wrong;
+      document.getElementById('finalTime').textContent = formatTime(state.seconds);
+
+      const wonRace = state.playerPos >= state.aiPos && state.correct >= 6;
+
+      if (state.correct === 10) {
+        document.getElementById('resultTrophy').textContent = '🏆🥇🏎️';
+        document.getElementById('resultTitle').textContent = 'JUARA 1 SEMPURNA!';
+        document.getElementById('resultSubtitle').textContent = 'Luar biasa! 10/10 soal terjawab benar tanpa kesalahan!';
+        playTone('win');
+        launchConfetti();
+      } else if (wonRace) {
+        document.getElementById('resultTrophy').textContent = '🏆🎉';
+        document.getElementById('resultTitle').textContent = 'KAMU MENANG BALAPAN!';
+        document.getElementById('resultSubtitle').textContent = 'Hebat! Mobilmu berhasil mengungguli lawan AI!';
+        playTone('win');
+        launchConfetti();
+      } else {
+        document.getElementById('resultTrophy').textContent = '🏁💪';
+        document.getElementById('resultTitle').textContent = 'BALAPAN SELESAI!';
+        document.getElementById('resultSubtitle').textContent = 'Terus berlatih pecahan agar mobilmu melaju lebih cepat lagi!';
+        playTone('finish');
+      }
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.parentElement.offsetWidth;
+      canvas.height = canvas.parentElement.offsetHeight;
+
+      const pieces = Array.from({ length: 70 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: 8 + Math.random() * 6,
+        h: 6 + Math.random() * 6,
+        color: ['#fde047', '#34d399', '#38bdf8', '#fb7185', '#c084fc'][Math.floor(Math.random() * 5)],
+        vy: 2 + Math.random() * 3,
+        vx: -1.5 + Math.random() * 3,
+        rot: Math.random() * Math.PI
+      }));
+
+      let frames = 0;
+      function draw() {
+        if (frames > 220) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          return;
+        }
+        frames++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += 0.06;
+          if (p.y > canvas.height) p.y = -10;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    /**
+     * ============================================================================
+     * NAVIGASI MODAL, FULLSCREEN & SINTESIS AUDIO (Web Audio API)
+     * ============================================================================
+     */
+    function confirmExit() {
+      document.getElementById('exitModal').classList.remove('hidden');
+    }
+
+    function closeExitModal() {
+      document.getElementById('exitModal').classList.add('hidden');
+    }
+
+    function goHome() {
+      clearIntervals();
+      closeExitModal();
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      document.getElementById('homeScreen').classList.remove('hidden');
+    }
+
+    function toggleSound() {
+      state.soundOn = !state.soundOn;
+      document.querySelectorAll('.sound-label').forEach((el) => {
+        el.textContent = state.soundOn ? 'SUARA ON' : 'SUARA OFF';
+      });
+      const iconSpan = document.querySelector('#globalSoundBtn span:first-child');
+      if (iconSpan) iconSpan.textContent = state.soundOn ? '🔊' : '🔇';
+      showToast(state.soundOn ? '🔊 Efek suara diaktifkan' : '🔇 Efek suara dimatikan');
+    }
+
+    function toggleFullScreen() {
+      try {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {
+            showToast('Mode layar penuh tidak didukung di jendela ini');
+          });
+        } else {
+          document.exitFullscreen?.();
+        }
+      } catch (err) {
+        showToast('Mode layar penuh tidak tersedia');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastMsg');
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0');
+      setTimeout(() => toast.classList.add('opacity-0'), 2000);
+    }
+
+    function playTone(type) {
+      if (!state.soundOn) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+
+        const patterns = {
+          click: [{ f: 440, d: 0.06, t: 'sine' }],
+          beep: [{ f: 520, d: 0.14, t: 'triangle' }],
+          go: [{ f: 784, d: 0.28, t: 'triangle' }],
+          correct: [
+            { f: 523.25, d: 0.1, t: 'sine' },
+            { f: 659.25, d: 0.1, t: 'sine' },
+            { f: 783.99, d: 0.18, t: 'sine' }
+          ],
+          turbo: [
+            { f: 523.25, d: 0.08, t: 'triangle' },
+            { f: 659.25, d: 0.08, t: 'triangle' },
+            { f: 783.99, d: 0.08, t: 'triangle' },
+            { f: 1046.5, d: 0.22, t: 'triangle' }
+          ],
+          wrong: [
+            { f: 220, d: 0.15, t: 'sawtooth' },
+            { f: 165, d: 0.22, t: 'sawtooth' }
+          ],
+          win: [
+            { f: 523.25, d: 0.12, t: 'triangle' },
+            { f: 659.25, d: 0.12, t: 'triangle' },
+            { f: 783.99, d: 0.12, t: 'triangle' },
+            { f: 1046.5, d: 0.35, t: 'triangle' }
+          ],
+          finish: [
+            { f: 440, d: 0.15, t: 'sine' },
+            { f: 523.25, d: 0.25, t: 'sine' }
+          ]
+        };
+
+        const seq = patterns[type] || patterns.click;
+        let offset = 0;
+
+        seq.forEach((note) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = note.t;
+          osc.frequency.setValueAtTime(note.f, ctx.currentTime + offset);
+
+          gain.gain.setValueAtTime(0.12, ctx.currentTime + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + note.d);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(ctx.currentTime + offset);
+          osc.stop(ctx.currentTime + offset + note.d + 0.02);
+          offset += note.d * 0.9;
+        });
+
+        setTimeout(() => ctx.close(), 1500);
+      } catch (e) {
+        // Abaikan jika browser memblokir autoplay audio sebelum interaksi
+      }
+    }
+  </script>
+</body>
+</html>
